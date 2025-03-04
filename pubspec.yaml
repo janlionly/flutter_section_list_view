@@ -5,7 +5,7 @@ author: Dharmendra Singh Yadav <dsyadav.glaitm@gmail.com>
 homepage: https://github.com/dharmendraiosdev/flutter_section_list_view
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.19.0 <4.0.0"
 
 dependencies:
   flutter:

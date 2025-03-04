@@ -12,13 +12,13 @@ typedef Future<void> RefreshList();
 // ignore: must_be_immutable
 class FlutterSectionListView extends StatefulWidget {
   FlutterSectionListView({
-    this.numberOfSection,
-    @required this.numberOfRowsInSection,
-    this.sectionWidget,
-    this.physics,
-    @required this.rowWidget,
-  }) : assert(!(numberOfRowsInSection == null || rowWidget == null),
-            'numberOfRowsInSection and rowWidget are mandatory');
+    required this.numberOfSection,
+    required this.numberOfRowsInSection,
+    required this.sectionWidget,
+    this.physics = const BouncingScrollPhysics(),
+    required this.rowWidget,
+    Key? key,
+  }) : super(key: key);
 
   /// Defines the total number of sections
   final NumberOfSectionCallBack numberOfSection;
@@ -36,13 +36,13 @@ class FlutterSectionListView extends StatefulWidget {
   final ScrollPhysics physics;
 
   /// A callback method used to load more data when listview reached to end.
-  LoadMoreData loadMoreData;
+  LoadMoreData? loadMoreData;
 
   /// Return false when there are no more pages to return
   bool isMoreAvailable = true;
 
   /// Handle this callback when need pull to refresh.
-  RefreshList refresh;
+  RefreshList? refresh;
 
   @override
   _FlutterSectionListViewState createState() => _FlutterSectionListViewState();
@@ -50,7 +50,7 @@ class FlutterSectionListView extends StatefulWidget {
 
 class _FlutterSectionListViewState extends State<FlutterSectionListView> {
   /// List of total number of rows and section in each group
-  var itemList = new List<int>();
+  var itemList = <int>[];
   bool isLoading = false;
   int itemCount = 0;
   int sectionCount = 0;
@@ -65,7 +65,10 @@ class _FlutterSectionListViewState extends State<FlutterSectionListView> {
   }
 
   Future<void> refreshList() async {
-    await widget.refresh().whenComplete(() {
+    if (widget.refresh == null) {
+      return;
+    }
+    await widget.refresh!().whenComplete(() {
       setState(() {
         sectionCount = widget.numberOfSection();
         itemCount = listItemCount();
@@ -97,14 +100,16 @@ class _FlutterSectionListViewState extends State<FlutterSectionListView> {
                   setState(() {
                     isLoading = true;
                   });
-                  final Future<void> loadMoreResult = widget.loadMoreData();
-                  loadMoreResult.whenComplete(() {
-                    setState(() {
-                      isLoading = false;
-                      sectionCount = widget.numberOfSection();
-                      itemCount = listItemCount();
+                  if (widget.loadMoreData != null) {
+                    final Future<void> loadMoreResult = widget.loadMoreData!();
+                    loadMoreResult.whenComplete(() {
+                      setState(() {
+                        isLoading = false;
+                        sectionCount = widget.numberOfSection();
+                        itemCount = listItemCount();
+                      });
                     });
-                  });
+                  }
                 }
               }
               return false;
@@ -132,7 +137,7 @@ class _FlutterSectionListViewState extends State<FlutterSectionListView> {
 
   /// Get the total count of items in list(including both row and sections)
   int listItemCount() {
-    itemList = new List<int>();
+    itemList = <int>[];
     int rowCount = 0;
 
     for (int i = 0; i < sectionCount; i++) {
@@ -180,8 +185,7 @@ class _FlutterSectionListViewState extends State<FlutterSectionListView> {
 
 /// Helper class for indexPath of each item in list
 class IndexPath {
-  IndexPath({this.section, this.row});
-
+  IndexPath({required this.section, required this.row});
   int section = 0;
   int row = 0;
 }
