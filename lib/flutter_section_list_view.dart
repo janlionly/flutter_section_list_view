@@ -18,7 +18,7 @@ class FlutterSectionListView extends StatefulWidget {
     this.physics = const BouncingScrollPhysics(),
     required this.rowWidget,
     Key? key,
-  }) : super(key: key);
+  }) : super(key: key ?? UniqueKey());
 
   /// Defines the total number of sections
   final NumberOfSectionCallBack numberOfSection;
