@@ -17,6 +17,7 @@ class FlutterSectionListView extends StatefulWidget {
     required this.sectionWidget,
     this.physics = const BouncingScrollPhysics(),
     required this.rowWidget,
+    this.shrinkWrap = false,
     Key? key,
   }) : super(key: key ?? UniqueKey());
 
@@ -34,6 +35,9 @@ class FlutterSectionListView extends StatefulWidget {
   
   /// [ScrollPhysics] provided by that behavior will take precedence after[physics]
   final ScrollPhysics physics;
+
+  /// [bool] to control whether the ListView should be allowed to shrink.
+  final bool shrinkWrap;
 
   /// A callback method used to load more data when listview reached to end.
   LoadMoreData? loadMoreData;
@@ -121,6 +125,7 @@ class _FlutterSectionListViewState extends State<FlutterSectionListView> {
               },
               key: widget.key,
               physics: widget.physics,
+              shrinkWrap: widget.shrinkWrap,
             ),
           ),
         ),
