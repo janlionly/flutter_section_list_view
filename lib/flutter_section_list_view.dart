@@ -18,6 +18,7 @@ class FlutterSectionListView extends StatefulWidget {
     this.physics = const BouncingScrollPhysics(),
     required this.rowWidget,
     this.shrinkWrap = false,
+    this.mainAxisSize = MainAxisSize.max,
     Key? key,
   }) : super(key: key ?? UniqueKey());
 
@@ -35,6 +36,9 @@ class FlutterSectionListView extends StatefulWidget {
   
   /// [ScrollPhysics] provided by that behavior will take precedence after[physics]
   final ScrollPhysics physics;
+
+  /// [MainAxisSize] to control the main axis of the ListView.
+  final MainAxisSize mainAxisSize;
 
   /// [bool] to control whether the ListView should be allowed to shrink.
   final bool shrinkWrap;
@@ -92,6 +96,7 @@ class _FlutterSectionListViewState extends State<FlutterSectionListView> {
 
   Widget listView() {
     return Column(
+      mainAxisSize: widget.mainAxisSize,
       children: <Widget>[
         Expanded(
           child: NotificationListener<ScrollNotification>(
