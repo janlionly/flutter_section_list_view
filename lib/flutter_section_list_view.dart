@@ -33,7 +33,7 @@ class FlutterSectionListView extends StatefulWidget {
 
   /// Mandatory callback method to get the row widget
   final RowsWidgetCallBack rowWidget;
-  
+
   /// [ScrollPhysics] provided by that behavior will take precedence after[physics]
   final ScrollPhysics physics;
 
@@ -95,54 +95,65 @@ class _FlutterSectionListViewState extends State<FlutterSectionListView> {
   }
 
   Widget listView() {
-    return Column(
-      mainAxisSize: widget.mainAxisSize,
-      children: <Widget>[
-        Expanded(
-          child: NotificationListener<ScrollNotification>(
-            onNotification: (ScrollNotification scrollInfo) {
-              if (!isLoading &&
-                  widget.isMoreAvailable &&
-                  scrollInfo.metrics.pixels ==
-                      scrollInfo.metrics.maxScrollExtent) {
-                if (widget.loadMoreData != null) {
-                  setState(() {
-                    isLoading = true;
-                  });
-                  if (widget.loadMoreData != null) {
-                    final Future<void> loadMoreResult = widget.loadMoreData!();
-                    loadMoreResult.whenComplete(() {
-                      setState(() {
-                        isLoading = false;
-                        sectionCount = widget.numberOfSection();
-                        itemCount = listItemCount();
-                      });
-                    });
-                  }
-                }
-              }
-              return false;
+    return widget.loadMoreData == null
+        ? ListView.builder(
+            itemCount: itemCount,
+            itemBuilder: (context, index) {
+              return buildItemWidget(index);
             },
-            child: ListView.builder(
-              itemCount: itemCount,
-              itemBuilder: (context, index) {
-                return buildItemWidget(index);
-              },
-              key: widget.key,
-              physics: widget.physics,
-              shrinkWrap: widget.shrinkWrap,
-            ),
-          ),
-        ),
-        Container(
-          height: isLoading ? 50.0 : 0,
-          color: Colors.transparent,
-          child: Center(
-            child: new CircularProgressIndicator(),
-          ),
-        ),
-      ],
-    );
+            key: widget.key,
+            physics: widget.physics,
+            shrinkWrap: widget.shrinkWrap,
+          )
+        : Column(
+            mainAxisSize: widget.mainAxisSize,
+            children: <Widget>[
+              Expanded(
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: (ScrollNotification scrollInfo) {
+                    if (!isLoading &&
+                        widget.isMoreAvailable &&
+                        scrollInfo.metrics.pixels ==
+                            scrollInfo.metrics.maxScrollExtent) {
+                      if (widget.loadMoreData != null) {
+                        setState(() {
+                          isLoading = true;
+                        });
+                        if (widget.loadMoreData != null) {
+                          final Future<void> loadMoreResult =
+                              widget.loadMoreData!();
+                          loadMoreResult.whenComplete(() {
+                            setState(() {
+                              isLoading = false;
+                              sectionCount = widget.numberOfSection();
+                              itemCount = listItemCount();
+                            });
+                          });
+                        }
+                      }
+                    }
+                    return false;
+                  },
+                  child: ListView.builder(
+                    itemCount: itemCount,
+                    itemBuilder: (context, index) {
+                      return buildItemWidget(index);
+                    },
+                    key: widget.key,
+                    physics: widget.physics,
+                    shrinkWrap: widget.shrinkWrap,
+                  ),
+                ),
+              ),
+              Container(
+                height: isLoading ? 50.0 : 0,
+                color: Colors.transparent,
+                child: Center(
+                  child: new CircularProgressIndicator(),
+                ),
+              ),
+            ],
+          );
   }
 
   /// Get the total count of items in list(including both row and sections)
